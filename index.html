@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator Pink Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: green;
+        }
+        .error {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Aviator Pink Predictor</h1>
+        <input type="text" id="lastPinkTime" placeholder="Enter Last Pink Time (YYYY-MM-DD HH:mm:ss)" />
+        <button onclick="predictNextPink()">Predict Next Pink</button>
+        <div class="result" id="result"></div>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        async function predictNextPink() {
+            const lastPinkTime = document.getElementById("lastPinkTime").value;
+            const resultDiv = document.getElementById("result");
+            const errorDiv = document.getElementById("error");
+
+            // Clear previous results
+            resultDiv.textContent = "";
+            errorDiv.textContent = "";
+
+            if (!lastPinkTime) {
+                errorDiv.textContent = "Please enter a valid time!";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ last_pink_time: lastPinkTime })
+                });
+
+                const data = await response.json();
+                if (data.status === "success") {
+                    resultDiv.textContent = `Next Pink Time: ${data.next_pink_time}`;
+                } else {
+                    errorDiv.textContent = data.message || "An error occurred!";
+                }
+            } catch (error) {
+                errorDiv.textContent = "Failed to connect to the server!";
+            }
+        }
+    </script>
+</body>
+</html>
